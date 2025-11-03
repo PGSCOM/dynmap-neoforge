@@ -1507,8 +1507,6 @@ public class DynmapPlugin
         // Extract default permission example, if needed
         File filepermexample = new File(core.getDataFolder(), "permissions.yml.example");
         core.createDefaultFileFromResource("/permissions.yml.example", filepermexample);
-
-        DynmapCommonAPIListener.apiInitialized(core);
     }
     
     private static int test(CommandSource source) throws CommandSyntaxException
@@ -1582,7 +1580,7 @@ public class DynmapPlugin
         registerEvents();
         Log.info("Register events");
         
-        //DynmapCommonAPIListener.apiInitialized(core);
+        DynmapCommonAPIListener.apiInitialized(core);
 
         Log.info("Enabled");
     }
