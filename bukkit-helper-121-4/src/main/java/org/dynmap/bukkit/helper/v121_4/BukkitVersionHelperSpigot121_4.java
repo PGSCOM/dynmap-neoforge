@@ -212,19 +212,68 @@ public class BukkitVersionHelperSpigot121_4 extends BukkitVersionHelper {
     /** Get temperature from biomebase */
     @Override
     public float getBiomeBaseTemperature(Object bb) {
-    	return ((BiomeBase)bb).g();
+		try {
+			return ((BiomeBase)bb).g();
+		}
+		catch (IllegalAccessError | NoSuchMethodError e) {
+			try {
+				java.lang.reflect.Method m = bb.getClass().getMethod("getClimate");
+				Object climate = m.invoke(bb);
+				if (climate != null) {
+					java.lang.reflect.Method tm = climate.getClass().getMethod("temperature");
+					Object val = tm.invoke(climate);
+					if (val instanceof Float) return (Float)val;
+					if (val instanceof Double) return ((Double)val).floatValue();
+				}
+			}
+			catch (Throwable t) { }
+			return 0.5F;
+		}
+		catch (Throwable t) {
+			return 0.5F;
+		}
     }
 
     /** Get humidity from biomebase */
     @Override
     public float getBiomeBaseHumidity(Object bb) {
-    	String vals = ((BiomeBase)bb).i.toString();	// Sleazy
-    	float humidity = 0.5F;
-    	int idx = vals.indexOf("downfall=");
-    	if (idx >= 0) {
-        	humidity = Float.parseFloat(vals.substring(idx+9, vals.indexOf(']', idx)));
-    	}
-    	return humidity;
+		try {
+			String vals = ((BiomeBase)bb).i.toString();
+			float humidity = 0.5F;
+			int idx = vals.indexOf("downfall=");
+			if (idx >= 0) {
+				humidity = Float.parseFloat(vals.substring(idx+9, vals.indexOf(']', idx)));
+			}
+			return humidity;
+		}
+		catch (IllegalAccessError | NoSuchFieldError e) {
+			try {
+				java.lang.reflect.Method m = null;
+				Object climate = null;
+				try {
+					m = bb.getClass().getMethod("getModifiedClimateSettings");
+					climate = m.invoke(bb);
+				}
+				catch (NoSuchMethodException nsme) {
+					try {
+						m = bb.getClass().getMethod("getClimate");
+						climate = m.invoke(bb);
+					}
+					catch (Throwable tt) { climate = null; }
+				}
+				if (climate != null) {
+					java.lang.reflect.Method dm = climate.getClass().getMethod("downfall");
+					Object val = dm.invoke(climate);
+					if (val instanceof Float) return (Float)val;
+					if (val instanceof Double) return ((Double)val).floatValue();
+				}
+			}
+			catch (Throwable t) { }
+			return 0.5F;
+		}
+		catch (Throwable t) {
+			return 0.5F;
+		}
     }
     
     @Override

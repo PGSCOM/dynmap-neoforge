@@ -1422,7 +1422,7 @@ public class DynmapPlugin
             	ResourceLocation regid = getBiomeReg().getKey(bb);
                 String id = regid.getPath();
                 String rl = regid.toString();
-                float tmp = bb.getBaseTemperature(), hum = bb.getModifiedClimateSettings().downfall();
+                float tmp = BiomeAccessHelper.getBaseTemperatureSafe(bb), hum = BiomeAccessHelper.getDownfallSafe(bb);
                 int watermult = bb.getWaterColor();
                 Log.verboseinfo("biome[" + i + "]: hum=" + hum + ", tmp=" + tmp + ", mult=" + Integer.toHexString(watermult));
 

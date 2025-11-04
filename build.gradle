@@ -64,6 +64,21 @@ subprojects {
   }
 }
 
+// Optional: use Java 21 toolchain for all subprojects when building modules that require reading
+// Java 21 class files (e.g., Spigot 1.20.5+ APIs compiled with class version 65).
+// Enable with -DuseJava21=true
+if (System.getProperty('useJava21') == 'true') {
+  subprojects { 
+    plugins.withId('java') {
+      java {
+        toolchain {
+          languageVersion = JavaLanguageVersion.of(21)
+        }
+      }
+    }
+  }
+}
+
 clean {
   delete "target" 
 }

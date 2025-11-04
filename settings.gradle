@@ -8,6 +8,78 @@ pluginManagement {
 
 rootProject.name = 'dynmap-common'
 
+// Optional: limit included projects via -DonlyProject=<projectPath>
+// Example: -DonlyProject=:forge-1.21 to include only minimal set needed to build Forge 1.21
+def onlyProject = System.getProperty("onlyProject")
+if (onlyProject != null) {
+  // minimal dependency graph for Forge 1.21.x
+  if (onlyProject == ":forge-1.21") {
+    include ':DynmapCore'
+    include ':DynmapCoreAPI'
+    include ':dynmap-api'
+    include ':forge-1.21'
+    project(':DynmapCore').projectDir = "$rootDir/DynmapCore" as File
+    project(':DynmapCoreAPI').projectDir = "$rootDir/DynmapCoreAPI" as File
+    project(':dynmap-api').projectDir = "$rootDir/dynmap-api" as File
+    project(':forge-1.21').projectDir = "$rootDir/forge-1.21" as File
+    return
+  }
+  // minimal dependency graph for Spigot plugin build
+  if (onlyProject == ":spigot") {
+    include ':DynmapCore'
+    include ':DynmapCoreAPI'
+    include ':dynmap-api'
+    include ':spigot'
+    include ':bukkit-helper'
+    include ':bukkit-helper-113-2'
+    include ':bukkit-helper-114-1'
+    include ':bukkit-helper-115'
+    include ':bukkit-helper-116'
+    include ':bukkit-helper-116-2'
+    include ':bukkit-helper-116-3'
+    include ':bukkit-helper-116-4'
+    include ':bukkit-helper-117'
+    include ':bukkit-helper-118'
+    include ':bukkit-helper-118-2'
+    include ':bukkit-helper-119'
+    include ':bukkit-helper-119-3'
+    include ':bukkit-helper-119-4'
+    include ':bukkit-helper-120'
+    include ':bukkit-helper-120-2'
+    include ':bukkit-helper-120-4'
+    include ':bukkit-helper-120-5'
+    include ':bukkit-helper-121'
+    include ':bukkit-helper-121-3'
+    include ':bukkit-helper-121-4'
+    project(':DynmapCore').projectDir = "$rootDir/DynmapCore" as File
+    project(':DynmapCoreAPI').projectDir = "$rootDir/DynmapCoreAPI" as File
+    project(':dynmap-api').projectDir = "$rootDir/dynmap-api" as File
+    project(':spigot').projectDir = "$rootDir/spigot" as File
+    project(':bukkit-helper').projectDir = "$rootDir/bukkit-helper" as File
+    project(':bukkit-helper-113-2').projectDir = "$rootDir/bukkit-helper-113-2" as File
+    project(':bukkit-helper-114-1').projectDir = "$rootDir/bukkit-helper-114-1" as File
+    project(':bukkit-helper-115').projectDir = "$rootDir/bukkit-helper-115" as File
+    project(':bukkit-helper-116').projectDir = "$rootDir/bukkit-helper-116" as File
+    project(':bukkit-helper-116-2').projectDir = "$rootDir/bukkit-helper-116-2" as File
+    project(':bukkit-helper-116-3').projectDir = "$rootDir/bukkit-helper-116-3" as File
+    project(':bukkit-helper-116-4').projectDir = "$rootDir/bukkit-helper-116-4" as File
+    project(':bukkit-helper-117').projectDir = "$rootDir/bukkit-helper-117" as File
+    project(':bukkit-helper-118').projectDir = "$rootDir/bukkit-helper-118" as File
+    project(':bukkit-helper-118-2').projectDir = "$rootDir/bukkit-helper-118-2" as File
+    project(':bukkit-helper-119').projectDir = "$rootDir/bukkit-helper-119" as File
+    project(':bukkit-helper-119-3').projectDir = "$rootDir/bukkit-helper-119-3" as File
+    project(':bukkit-helper-119-4').projectDir = "$rootDir/bukkit-helper-119-4" as File
+    project(':bukkit-helper-120').projectDir = "$rootDir/bukkit-helper-120" as File
+    project(':bukkit-helper-120-2').projectDir = "$rootDir/bukkit-helper-120-2" as File
+    project(':bukkit-helper-120-4').projectDir = "$rootDir/bukkit-helper-120-4" as File
+    project(':bukkit-helper-120-5').projectDir = "$rootDir/bukkit-helper-120-5" as File
+    project(':bukkit-helper-121').projectDir = "$rootDir/bukkit-helper-121" as File
+    project(':bukkit-helper-121-3').projectDir = "$rootDir/bukkit-helper-121-3" as File
+    project(':bukkit-helper-121-4').projectDir = "$rootDir/bukkit-helper-121-4" as File
+    return
+  }
+}
+
 include ':spigot'
 include ':bukkit-helper-113-2'
 include ':bukkit-helper-114-1'

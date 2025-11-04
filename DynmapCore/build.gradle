@@ -10,6 +10,12 @@ eclipse {
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
+// Flag to optionally skip s3lite (AWS S3) dependencies and sources for isolated builds
+def skipS3lite = project.hasProperty('skipS3lite') || System.getProperty('skipS3lite') == 'true'
+if (skipS3lite) {
+    logger.lifecycle('[DynmapCore] skipS3lite enabled: excluding AWS S3 storage sources and dependencies')
+}
+
 dependencies {
     implementation project(':DynmapCoreAPI')
     implementation 'javax.servlet:javax.servlet-api:3.1'
@@ -19,13 +25,26 @@ dependencies {
     implementation 'org.yaml:snakeyaml:1.23'	// DON'T UPDATE - NEWER ONE TRIPS ON WINDOWS ENCODED FILES
     implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20180219.1'
     implementation 'org.postgresql:postgresql:42.2.18'
-    implementation 'io.github.linktosriram.s3lite:core:0.0.2-SNAPSHOT'
-    implementation 'io.github.linktosriram.s3lite:api:0.0.2-SNAPSHOT'
-    implementation 'io.github.linktosriram.s3lite:http-client-url-connection:0.0.2-SNAPSHOT'
-    implementation 'io.github.linktosriram.s3lite:http-client-spi:0.0.2-SNAPSHOT'
-    implementation 'io.github.linktosriram.s3lite:util:0.0.2-SNAPSHOT'
+    if (!skipS3lite) {
+        implementation 'io.github.linktosriram.s3lite:core:0.0.2-SNAPSHOT'
+        implementation 'io.github.linktosriram.s3lite:api:0.0.2-SNAPSHOT'
+        implementation 'io.github.linktosriram.s3lite:http-client-url-connection:0.0.2-SNAPSHOT'
+        implementation 'io.github.linktosriram.s3lite:http-client-spi:0.0.2-SNAPSHOT'
+        implementation 'io.github.linktosriram.s3lite:util:0.0.2-SNAPSHOT'
+    }
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:3.0.1'
     implementation 'com.sun.xml.bind:jaxb-impl:3.0.0'
+}
+
+// Exclude S3 storage sources when skipS3lite is enabled
+sourceSets {
+    main {
+        if (skipS3lite) {
+            java {
+                exclude 'org/dynmap/storage/aws_s3/**'
+            }
+        }
+    }
 }
 
 processResources {
@@ -60,11 +79,13 @@ shadowJar {
         include(dependency('org.eclipse.jetty::'))
         include(dependency('org.eclipse.jetty.orbit:javax.servlet:'))
         include(dependency('org.postgresql:postgresql:'))
-        include(dependency('io.github.linktosriram.s3lite:core:'))
-        include(dependency('io.github.linktosriram.s3lite:api:'))
-        include(dependency('io.github.linktosriram.s3lite:http-client-url-connection:'))
-        include(dependency('io.github.linktosriram.s3lite:http-client-spi:'))
-        include(dependency('io.github.linktosriram.s3lite:util:'))
+        if (!skipS3lite) {
+            include(dependency('io.github.linktosriram.s3lite:core:'))
+            include(dependency('io.github.linktosriram.s3lite:api:'))
+            include(dependency('io.github.linktosriram.s3lite:http-client-url-connection:'))
+            include(dependency('io.github.linktosriram.s3lite:http-client-spi:'))
+            include(dependency('io.github.linktosriram.s3lite:util:'))
+        }
         include(dependency('jakarta.xml.bind::'))
         include(dependency('com.sun.xml.bind::'))
         include(dependency(':DynmapCoreAPI'))
@@ -77,7 +98,9 @@ shadowJar {
 	relocate('org.owasp.html', 'org.dynmap.org.owasp.html')
 	relocate('javax.servlet', 'org.dynmap.javax.servlet' )
 	relocate('org.postgresql', 'org.dynmap.org.postgresql')
-	relocate('io.github.linktosriram.s3lite', 'org.dynmap.s3lite')    
+	if (!skipS3lite) {
+	    relocate('io.github.linktosriram.s3lite', 'org.dynmap.s3lite')
+	}
 	
     destinationDirectory = file '../target'
     archiveClassifier = ''

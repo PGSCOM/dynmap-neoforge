@@ -12,6 +12,13 @@ apply plugin: 'net.minecraftforge.gradle'
 //apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'eclipse'
 
+// Ensure we use JDK 21 for compiling this module regardless of the running JDK
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 eclipse {
     project {
         name = "Dynmap(Forge-1.21)"

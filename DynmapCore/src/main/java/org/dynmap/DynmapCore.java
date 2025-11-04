@@ -54,7 +54,6 @@ import org.dynmap.modsupport.ModSupportImpl;
 import org.dynmap.renderer.DynmapBlockState;
 import org.dynmap.servlet.*;
 import org.dynmap.storage.MapStorage;
-import org.dynmap.storage.aws_s3.AWSS3MapStorage;
 import org.dynmap.storage.filetree.FileTreeMapStorage;
 import org.dynmap.storage.mysql.MySQLMapStorage;
 import org.dynmap.storage.mssql.MicrosoftSQLMapStorage;
@@ -455,7 +454,13 @@ public class DynmapCore implements DynmapCommonAPI {
             defaultStorage = new PostgreSQLMapStorage();
         }
         else if (storetype.equals("aws_s3")) {
-            defaultStorage = new AWSS3MapStorage();
+            try {
+                Class<?> cls = Class.forName("org.dynmap.storage.aws_s3.AWSS3MapStorage");
+                defaultStorage = (MapStorage) cls.getDeclaredConstructor().newInstance();
+            } catch (Throwable t) {
+                Log.severe("AWS S3 storage support not available in this build - rebuild without -PskipS3lite or configure a different storage back-end");
+                return false;
+            }
         }
         else if (storetype.equals("microsoftsql")) {
             defaultStorage = new MicrosoftSQLMapStorage();
