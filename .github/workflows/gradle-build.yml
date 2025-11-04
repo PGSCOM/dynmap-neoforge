@@ -1,0 +1,51 @@
+name: Gradle build
+
+on:
+  push:
+    branches: [ "v3.0", "main" ]
+  pull_request:
+    branches: [ "v3.0", "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build (matrix Java)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [17, 21]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+          cache: gradle
+
+      - name: Ensure gradlew is executable
+        run: chmod +x gradlew
+
+      - name: Build (Gradle)
+        run: ./gradlew -S --no-daemon build
+        env:
+          CI: true
+
+      - name: Upload built JARs
+        uses: actions/upload-artifact@v4
+        with:
+          name: jars-${{ matrix.java }}
+          path: '**/build/libs/*.jar'
+
+  license-check:
+    name: "Optional: check license headers"
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run a simple check (placeholder)
+        run: echo "No-op license check — customize as needed"
